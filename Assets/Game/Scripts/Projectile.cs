@@ -27,9 +27,11 @@ public class Projectile : MonoBehaviour {
         }
         else if (!enemyBullet && collision.tag == "Enemy")
         {
-            collision.GetComponent<Enemy>().GetDamage(damage);
-            if (destroyedByCollision)
-                Destruction();
+            if (collision.GetComponent<Enemy>() != null) {
+                collision.GetComponent<Enemy>().GetDamage(damage);
+            }
+        } else if (enemyBullet && collision.tag == "Ultimate") {
+            Destruction();
         }
     }
 

@@ -27,13 +27,20 @@ public class Boundary : MonoBehaviour {
 
     //when another object leaves collider
     private void OnTriggerExit2D(Collider2D collision) 
-    {        
-        if (collision.tag == "Projectile")
-        {
+    {
+        //if (collision.tag == "Projectile")
+        //{
+        //    Destroy(collision.gameObject);
+        //}
+        //else if (collision.tag == "Bonus") 
+        //    Destroy(collision.gameObject); 
+
+        if (collision.tag == "EnemyProjectile") {
             Destroy(collision.gameObject);
         }
-        else if (collision.tag == "Bonus") 
-            Destroy(collision.gameObject); 
+
+        if (collision.tag == "Bonus")
+            Destroy(collision.gameObject);
     }
 
 }

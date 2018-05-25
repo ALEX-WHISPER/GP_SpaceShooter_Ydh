@@ -30,10 +30,15 @@ public class Enemy : MonoBehaviour {
     //coroutine making a shot
     void ActivateShooting() 
     {
-        if (Random.value < (float)shotChance / 100)                             //if random value less than shot probability, making a shot
+        if (Random.value < (float)shotChance / 100 && Projectile != null)                             //if random value less than shot probability, making a shot
         {                         
             Instantiate(Projectile,  gameObject.transform.position, Quaternion.identity);             
         }
+    }
+
+    public void DamageToDie() {
+        health = 0;
+        Destruction();
     }
 
     //method of getting damage for the 'Enemy'
@@ -56,12 +61,15 @@ public class Enemy : MonoBehaviour {
             else
                 Player.instance.GetDamage(1);
         }
+        if (collision.tag == "Ultimate") {
+            DamageToDie();
+        }
     }
 
     //method of destroying the 'Enemy'
     void Destruction()                           
     {        
-        Instantiate(destructionVFX, transform.position, Quaternion.identity); 
+        Instantiate(destructionVFX, transform.position, Quaternion.identity);
         Destroy(gameObject);
     }
 }

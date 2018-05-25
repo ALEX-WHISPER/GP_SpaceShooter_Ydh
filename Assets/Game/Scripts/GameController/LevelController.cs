@@ -12,19 +12,19 @@ public class EnemyWaves
     [Tooltip("Enemy wave's prefab")]
     public GameObject wave;
 }
-
 #endregion
 
 public class LevelController : MonoBehaviour {
 
     //Serializable classes implements
-    public EnemyWaves[] enemyWaves; 
+    public EnemyWaves[] enemyWaves;
+    public Bonus[] bonusWaves;
     
-    public GameObject powerUp;
-    public float timeForNewPowerup;
     public GameObject[] planets;
     public float timeBetweenPlanets;
     public float planetsSpeed;
+
+    public static Dictionary<SkillType, bool> skillPickedStateDic = new Dictionary<SkillType, bool>();
     List<GameObject> planetsList = new List<GameObject>();
 
     Camera mainCamera;   
@@ -32,13 +32,23 @@ public class LevelController : MonoBehaviour {
     private void Start()
     {
         mainCamera = Camera.main;
+
+        BonusWaveSpawning();
+        EnemyWavesSpawning();
+        StartCoroutine(PlanetsCreation());
+    }
+
+    private void EnemyWavesSpawning() {
         //for each element in 'enemyWaves' array creating coroutine which generates the wave
-        for (int i = 0; i<enemyWaves.Length; i++) 
-        {
+        for (int i = 0; i < enemyWaves.Length; i++) {
             StartCoroutine(CreateEnemyWave(enemyWaves[i].timeToStart, enemyWaves[i].wave));
         }
-        StartCoroutine(PowerupBonusCreation());
-        StartCoroutine(PlanetsCreation());
+    }
+
+    private void BonusWaveSpawning() {
+        for (int i = 0; i < bonusWaves.Length; i++) {
+            StartCoroutine(EachBonusSpawning(bonusWaves[i]));
+        }
     }
     
     //Create a new wave after a delay
@@ -51,22 +61,31 @@ public class LevelController : MonoBehaviour {
     }
 
     //endless coroutine generating 'levelUp' bonuses. 
-    IEnumerator PowerupBonusCreation() 
+    IEnumerator EachBonusSpawning(Bonus bonusInfo) 
     {
         while (true) 
         {
-            yield return new WaitForSeconds(timeForNewPowerup);
+            if (!bonusInfo) {
+                break;
+            }
+
+            if (skillPickedStateDic.ContainsKey(bonusInfo.m_SkillType) && skillPickedStateDic[bonusInfo.m_SkillType]) {
+                break;
+            }
+
+            yield return new WaitForSeconds(bonusInfo.spawningDelay);
+
             Instantiate(
-                powerUp,
+                bonusInfo,
                 //Set the position for the new bonus: for X-axis - random position between the borders of 'Player's' movement; for Y-axis - right above the upper screen border 
                 new Vector2(
                     Random.Range(PlayerMoving.instance.borders.minX, PlayerMoving.instance.borders.maxX), 
-                    mainCamera.ViewportToWorldPoint(Vector2.up).y + powerUp.GetComponent<Renderer>().bounds.size.y / 2), 
+                    mainCamera.ViewportToWorldPoint(Vector2.up).y + bonusInfo.GetComponent<Renderer>().bounds.size.y / 2), 
                 Quaternion.identity
                 );
         }
     }
-
+    
     IEnumerator PlanetsCreation()
     {
         //Create a new list copying the arrey

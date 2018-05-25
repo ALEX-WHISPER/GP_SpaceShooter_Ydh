@@ -25,10 +25,10 @@ public class LevelLoader : MonoBehaviour {
 
     private void Update() {
         if (Input.GetKey(KeyCode.LeftShift)) {
-            Debug.Log("get key: LeftShift");
-            if (Input.GetKeyDown(KeyCode.RightArrow)) {
-                Debug.Log("get key: RightArrow");
+            if (Input.GetKeyDown(KeyCode.PageDown)) {
                 LoadLevelWithUISettings(SceneManager.GetActiveScene().buildIndex + 1);
+            } else if (Input.GetKeyDown(KeyCode.PageUp)) {
+                LoadLevelWithUISettings(SceneManager.GetActiveScene().buildIndex - 1);
             }
         }
     }
@@ -75,7 +75,7 @@ public class LevelLoader : MonoBehaviour {
     }
 
     IEnumerator LoadLevelAsync(int sceneIndex) {
-        if (sceneIndex >= SceneManager.sceneCountInBuildSettings - 1) {
+        if (sceneIndex >= SceneManager.sceneCountInBuildSettings - 1 || sceneIndex < 0) {
             sceneIndex = 0;
         }
 

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
 //guns objects in 'Player's' hierarchy
 [System.Serializable]
 public class Guns
@@ -33,6 +32,9 @@ public class PlayerShooting : MonoBehaviour {
     public static PlayerShooting instance;
 
     public Skill_PowerUp skill_PowerUp;
+    public Skill_UltiDiamond skill_UltiDiamond;
+
+    private GameObject m_UltiDiamondInstance;
 
     private void Awake()
     {
@@ -49,10 +51,12 @@ public class PlayerShooting : MonoBehaviour {
 
     private void OnEnable() {
         if (skill_PowerUp) skill_PowerUp.OnFireSkillWithLevel_PowerUp += UpdatePowerLevel;
+        if (skill_UltiDiamond) skill_UltiDiamond.OnFireSkill_UltiDiamond += FireUlti_Diamond;
     }
 
     private void OnDisable() {
         if (skill_PowerUp) skill_PowerUp.OnFireSkillWithLevel_PowerUp -= UpdatePowerLevel;
+        if (skill_UltiDiamond) skill_UltiDiamond.OnFireSkill_UltiDiamond -= FireUlti_Diamond;
     }
 
     private void Update()
@@ -66,11 +70,7 @@ public class PlayerShooting : MonoBehaviour {
             }
         }
     }
-
-    private void UpdatePowerLevel(int powerValue) {
-        weaponPower = powerValue;
-    }
-
+    
     //method for a shot
     void MakeAShot() 
     {
@@ -107,6 +107,30 @@ public class PlayerShooting : MonoBehaviour {
 
     void CreateLazerShot(GameObject lazer, Vector3 pos, Vector3 rot) //translating 'pooled' lazer shot to the defined position in the defined rotation
     {
-        Instantiate(lazer, pos, Quaternion.Euler(rot));
+        PoolManager.GetInstance.ReuseObject(lazer, pos, Quaternion.Euler(rot));
+        //Instantiate(lazer, pos, Quaternion.Euler(rot));
     }
+
+    #region Skill Handler
+    private void UpdatePowerLevel(int powerValue) {
+        weaponPower = powerValue;
+    }
+
+    private void FireUlti_Diamond(UltiDiamondInfo ultiInfo) {
+        StartCoroutine(CreateUltiDiamond(ultiInfo));
+    }
+
+    IEnumerator CreateUltiDiamond(UltiDiamondInfo ultiInfo) {
+        if (m_UltiDiamondInstance && !m_UltiDiamondInstance.activeSelf) {
+            m_UltiDiamondInstance.SetActive(true);
+        } else {
+            Debug.Log("m_UltiDiamondInstance is null, now instantiate it");
+            m_UltiDiamondInstance = Instantiate(ultiInfo.m_UltiDiamondPrefab, transform.position, Quaternion.identity, transform);
+        }
+
+        yield return new WaitForSeconds(ultiInfo.m_UltiDuration);
+
+        m_UltiDiamondInstance.SetActive(false);
+    }
+    #endregion
 }
