@@ -8,10 +8,10 @@ public class UltiDiamondInfo {
     public float m_UltiDuration;
 }
 
-public class Skill_UltiDiamond : SkillController{
+public class Skill_UltiDiamond : SkillController {
 
     public UltiDiamondInfo ultiInfo;
-    public event Action<UltiDiamondInfo> OnFireSkill_UltiDiamond;
+    public event Action<UltiDiamondInfo> FireSkill_UltiDiamond;
 
     protected override void OnEnable() {
         base.OnEnable();
@@ -26,8 +26,8 @@ public class Skill_UltiDiamond : SkillController{
     protected override void OnFireSkill() {
         if (!SkillEnabled || this.isCooling) { return; }
 
-        if (OnFireSkill_UltiDiamond != null) {
-            OnFireSkill_UltiDiamond(ultiInfo);
+        if (FireSkill_UltiDiamond != null) {
+            FireSkill_UltiDiamond(ultiInfo);
         }
 
         Cooling();

@@ -68,12 +68,12 @@ public class LevelController : MonoBehaviour {
             if (!bonusInfo) {
                 break;
             }
+            
+            yield return new WaitForSeconds(bonusInfo.spawningDelay);
 
             if (skillPickedStateDic.ContainsKey(bonusInfo.m_SkillType) && skillPickedStateDic[bonusInfo.m_SkillType]) {
                 break;
             }
-
-            yield return new WaitForSeconds(bonusInfo.spawningDelay);
 
             Instantiate(
                 bonusInfo,

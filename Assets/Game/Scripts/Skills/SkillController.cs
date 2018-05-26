@@ -4,7 +4,9 @@ using UnityEngine.UI;
 
 public enum SkillType {
     POWER_UP,
+    RATE_UP,
     ULTI_DIAMOND,
+    ULTI_MEDIC,
 }
 
 public abstract class SkillController: MonoBehaviour {
@@ -13,6 +15,7 @@ public abstract class SkillController: MonoBehaviour {
     public float coolingDuration;
     public KeyCode skillFireKey;
     public Animator m_Animator;
+    public bool skillEnabledOnStart = false;
 
     private bool skillEnabled = false;
 
@@ -56,7 +59,11 @@ public abstract class SkillController: MonoBehaviour {
     }
 
     protected virtual void Start() {
-        DisableSkill(this.m_SkillType);
+        if (skillEnabledOnStart) {
+            EnableSkill(this.m_SkillType);
+        } else {
+            DisableSkill(this.m_SkillType);
+        }
     }
 
 #if UNITY_EDITOR

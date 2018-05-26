@@ -17,6 +17,7 @@ public class Bonus : MonoBehaviour {
 
             if (!LevelController.skillPickedStateDic.ContainsKey(m_SkillType)) {
                 LevelController.skillPickedStateDic.Add(m_SkillType, true);
+                Debug.Log(string.Format("picked: {0}", m_SkillType));
             }
 
             Destroy(gameObject);

@@ -2,6 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
+public class ShootingSkills {
+    public Skill_PowerUp m_PowerUp;
+    public Skill_RateUp m_RateUp;
+    public Skill_UltiDiamond m_UltiDiamond;
+}
+
 //guns objects in 'Player's' hierarchy
 [System.Serializable]
 public class Guns
@@ -11,6 +18,8 @@ public class Guns
 }
 
 public class PlayerShooting : MonoBehaviour {
+
+    public ShootingSkills m_ShootingSkills;
 
     [Tooltip("shooting frequency. the higher the more frequent")]
     public float fireRate;
@@ -24,15 +33,14 @@ public class PlayerShooting : MonoBehaviour {
 
     [Tooltip("current weapon power")]
     [Range(1, 4)]       //change it if you wish
-    public int weaponPower = 1; 
+    public int weaponPower = 1;
+    [Range(1, 4)]
+    public int fireRatePower = 1;
 
     public Guns guns;
     bool shootingIsActive = true; 
     [HideInInspector] public int maxweaponPower = 4; 
     public static PlayerShooting instance;
-
-    public Skill_PowerUp skill_PowerUp;
-    public Skill_UltiDiamond skill_UltiDiamond;
 
     private GameObject m_UltiDiamondInstance;
 
@@ -50,13 +58,15 @@ public class PlayerShooting : MonoBehaviour {
     }
 
     private void OnEnable() {
-        if (skill_PowerUp) skill_PowerUp.OnFireSkillWithLevel_PowerUp += UpdatePowerLevel;
-        if (skill_UltiDiamond) skill_UltiDiamond.OnFireSkill_UltiDiamond += FireUlti_Diamond;
+        if (m_ShootingSkills.m_PowerUp) m_ShootingSkills.m_PowerUp.FireSkill_PowerUp += UpdatePowerLevel;
+        if (m_ShootingSkills.m_UltiDiamond) m_ShootingSkills.m_UltiDiamond.FireSkill_UltiDiamond += FireUlti_Diamond;
+        if (m_ShootingSkills.m_RateUp) m_ShootingSkills.m_RateUp.FireSkill_RateUp += UpdateFireRateLevel;
     }
 
     private void OnDisable() {
-        if (skill_PowerUp) skill_PowerUp.OnFireSkillWithLevel_PowerUp -= UpdatePowerLevel;
-        if (skill_UltiDiamond) skill_UltiDiamond.OnFireSkill_UltiDiamond -= FireUlti_Diamond;
+        if (m_ShootingSkills.m_PowerUp) m_ShootingSkills.m_PowerUp.FireSkill_PowerUp -= UpdatePowerLevel;
+        if (m_ShootingSkills.m_UltiDiamond) m_ShootingSkills.m_UltiDiamond.FireSkill_UltiDiamond -= FireUlti_Diamond;
+        if (m_ShootingSkills.m_RateUp) m_ShootingSkills.m_RateUp.FireSkill_RateUp -= UpdateFireRateLevel;
     }
 
     private void Update()
@@ -68,6 +78,20 @@ public class PlayerShooting : MonoBehaviour {
                 MakeAShot();                                                         
                 nextFire = Time.time + 1 / fireRate;
             }
+        }
+    }
+
+    private void FireRatePowerUp() {
+        switch(fireRatePower) {
+            case 1:
+                break;
+            case 2:
+            case 3:
+            case 4:
+                fireRate += 1f;
+                break;
+            default:
+                break;
         }
     }
     
@@ -112,6 +136,11 @@ public class PlayerShooting : MonoBehaviour {
     }
 
     #region Skill Handler
+    private void UpdateFireRateLevel(int levelValue) {
+        fireRatePower = levelValue;
+        FireRatePowerUp();
+    }
+
     private void UpdatePowerLevel(int powerValue) {
         weaponPower = powerValue;
     }
