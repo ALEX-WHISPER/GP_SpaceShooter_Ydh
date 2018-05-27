@@ -12,7 +12,9 @@ public class PlayerHealth : MonoBehaviour {
 
     [Serializable]
     public class DieEvent: UnityEvent { }
-    
+
+    public Skill_Medic skill_Medic;
+
     //  初始生命值
     public int m_InitHealthAmount = 5;
 
@@ -26,14 +28,33 @@ public class PlayerHealth : MonoBehaviour {
 
     //  当前生命值
     private int m_CurHealthAmount;
-    
+    private bool m_Invincible = false;
+
     private void Start() {
         SetHealth(m_InitHealthAmount);
+    }
+
+    private void OnEnable() {
+        if (skill_Medic)
+            skill_Medic.FireSkill_UltiMedic += GainHealth;
+    }
+
+    private void OnDisable() {
+        if (skill_Medic)
+            skill_Medic.FireSkill_UltiMedic += GainHealth;
     }
 
     public int GetCurHealthAmount {
         get;
         private set;
+    }
+
+    public void EnableInvincibility() {
+        m_Invincible = true;
+    }
+
+    public void DisableInvincibility() {
+        m_Invincible = false;
     }
 
     //  更新生命值
@@ -52,6 +73,10 @@ public class PlayerHealth : MonoBehaviour {
 
     //  受到伤害
     public void TakeDamage(int damageAmount) {
+        if (m_Invincible) {
+            return;
+        }
+
         this.m_CurHealthAmount -= damageAmount;
 
         if (m_CurHealthAmount <= 0) {

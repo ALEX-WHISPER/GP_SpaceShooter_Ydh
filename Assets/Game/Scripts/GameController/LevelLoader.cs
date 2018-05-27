@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class LevelLoader : MonoBehaviour {
     public GameObject loadingPanel;
-    public GameObject enemyUIPanel;
+    public GameObject panelToBeDeactivated;
     public Slider loadingBar;
     public string loadedHintText = "Hit 'SPACE' to continue...";
 
@@ -43,8 +43,8 @@ public class LevelLoader : MonoBehaviour {
         if (loadingPanel != null) {
             loadingPanel.SetActive(true);
         }
-        if (enemyUIPanel != null) {
-            enemyUIPanel.SetActive(false);
+        if (panelToBeDeactivated != null) {
+            panelToBeDeactivated.SetActive(false);
         }
         
         StartCoroutine(LoadLevelAsync(sceneIndex));
@@ -66,7 +66,7 @@ public class LevelLoader : MonoBehaviour {
         StartCoroutine(LoadLevelAsync(sceneIndex));
     }
 
-    private void LoadNextLevel() {
+    public void LoadNextLevel() {
         if (loadingPanel != null) {
             loadingPanel.SetActive(true);
         }

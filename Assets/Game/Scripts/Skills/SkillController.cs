@@ -68,6 +68,12 @@ public abstract class SkillController: MonoBehaviour {
 
 #if UNITY_EDITOR
     protected virtual void Update() {
+        if (Input.GetKey(KeyCode.LeftShift)) {
+            if (Input.GetKeyUp(skillFireKey)) {
+                EnableSkill(this.m_SkillType);
+            }
+        }
+
         if (Input.GetKeyUp(skillFireKey)) {
             OnFireSkill();
         }

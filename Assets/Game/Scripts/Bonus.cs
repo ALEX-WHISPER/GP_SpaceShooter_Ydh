@@ -6,7 +6,8 @@ public class Bonus : MonoBehaviour {
     public static event Action<SkillType> OnGetSkill;
 
     public float spawningDelay;
-    //when colliding with another object, if another objct is 'Player', sending command to the 'Player'
+
+    //  when colliding with another object, if another objct is 'Player', sending command to the 'Player'
     private void OnTriggerEnter2D(Collider2D collision) 
     {
         if (collision.tag == "Player") 

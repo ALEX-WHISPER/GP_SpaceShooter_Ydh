@@ -61,9 +61,6 @@ public class Enemy : MonoBehaviour {
             else
                 Player.instance.GetDamage(1);
         }
-        if (collision.tag == "Ultimate") {
-            DamageToDie();
-        }
     }
 
     //method of destroying the 'Enemy'

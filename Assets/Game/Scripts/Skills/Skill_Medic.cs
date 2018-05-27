@@ -19,9 +19,8 @@ public class Skill_Medic : SkillController {
     protected override void OnFireSkill() {
         if (!SkillEnabled || this.isCooling) { return; }
 
-        PlayerHealth playerHealth = FindObjectOfType<PlayerHealth>();
-        if (playerHealth != null) {
-            playerHealth.GainHealth(this.recoveringValue);
+        if (FireSkill_UltiMedic != null) {
+            FireSkill_UltiMedic(recoveringValue);
         }
 
         Cooling();

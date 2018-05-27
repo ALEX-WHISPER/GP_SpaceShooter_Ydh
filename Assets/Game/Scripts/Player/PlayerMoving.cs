@@ -2,10 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-/// <summary>
-/// This script defines the borders of ‘Player’s’ movement. Depending on the chosen handling type, it moves the ‘Player’ together with the pointer.
-/// </summary>
-
 [System.Serializable]
 public class Borders
 {
@@ -23,7 +19,17 @@ public class PlayerMoving : MonoBehaviour {
     Camera mainCamera;
     bool controlIsActive = true; 
 
-    public static PlayerMoving instance; //unique instance of the script for easy access to the script
+    public static PlayerMoving instance; // unique instance of the script for easy access to the script
+
+    public void EnableController() {
+        controlIsActive = true;
+        GetComponent<PlayerHealth>().DisableInvincibility();
+    }
+
+    public void DisableController() {
+        controlIsActive = false;
+        GetComponent<PlayerHealth>().EnableInvincibility();
+    }
 
     private void Awake()
     {
