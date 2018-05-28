@@ -31,6 +31,7 @@ public class LevelController : MonoBehaviour {
 
     private void Start()
     {
+        skillPickedStateDic.Clear();
         mainCamera = Camera.main;
 
         BonusWaveSpawning();
@@ -56,6 +57,11 @@ public class LevelController : MonoBehaviour {
     {
         if (delay != 0)
             yield return new WaitForSeconds(delay);
+
+        if (GameController.GetInstance.IsGameOver) {
+            yield break;
+        }
+
         if (Player.instance != null)
             Instantiate(Wave);
     }
@@ -65,6 +71,10 @@ public class LevelController : MonoBehaviour {
     {
         while (true) 
         {
+            if (GameController.GetInstance.IsGameOver) {
+                break;
+            }
+
             if (!bonusInfo) {
                 break;
             }
@@ -94,8 +104,13 @@ public class LevelController : MonoBehaviour {
             planetsList.Add(planets[i]);
         }
         yield return new WaitForSeconds(10);
+
         while (true)
         {
+            if (GameController.GetInstance.IsGameOver) {
+                break;
+            }
+
             ////choose random object from the list, generate and delete it
             int randomIndex = Random.Range(0, planetsList.Count);
             GameObject newPlanet = Instantiate(planetsList[randomIndex]);

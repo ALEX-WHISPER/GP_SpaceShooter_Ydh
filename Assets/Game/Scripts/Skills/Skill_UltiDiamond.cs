@@ -9,7 +9,6 @@ public class UltiDiamondInfo {
 }
 
 public class Skill_UltiDiamond : SkillController {
-
     public UltiDiamondInfo ultiInfo;
     public event Action<UltiDiamondInfo> FireSkill_UltiDiamond;
 

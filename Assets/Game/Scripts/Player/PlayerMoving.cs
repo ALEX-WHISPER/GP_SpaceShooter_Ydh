@@ -14,12 +14,38 @@ public class PlayerMoving : MonoBehaviour {
     public string playerMoveJoyStickName = "PlayerControl";
     public float moveSpeed = 25f;
 
+    public GameObject vfx_NormalEngineFire;
+    public GameObject vfx_VicEngineFire;
+
     [Tooltip("offset from viewport borders for player's movement")]
     public Borders borders;
     Camera mainCamera;
     bool controlIsActive = true; 
 
     public static PlayerMoving instance; // unique instance of the script for easy access to the script
+    
+    public void PlayerMoveToNextLevel() {
+        GetComponent<PlayerShooting>().DisableShooting();
+        controlIsActive = false;
+
+        if (vfx_NormalEngineFire != null) vfx_NormalEngineFire.SetActive(false);
+        if (vfx_VicEngineFire != null) vfx_VicEngineFire.SetActive(true);
+
+        StartCoroutine(MoveTowardsNextLevel());
+    }
+
+    IEnumerator MoveTowardsNextLevel() {
+        float elapsedTime = 0f;
+        float moveDuration = 4f;
+        Vector2 tagetPos = (Vector2)transform.position + Vector2.up * 20f;
+
+        while (elapsedTime < moveDuration) {
+            elapsedTime += Time.deltaTime;
+            transform.position = Vector2.MoveTowards(transform.position, tagetPos, moveSpeed * 2f * Time.deltaTime);
+
+            yield return null;
+        }
+    }
 
     public void EnableController() {
         controlIsActive = true;
@@ -85,7 +111,7 @@ public class PlayerMoving : MonoBehaviour {
                 */
         #endregion
 
-#if UNITY_EDITOR
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
         if (controlIsActive) {
             if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0) {
                 Vector2 keyboardAxis = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
@@ -96,7 +122,7 @@ public class PlayerMoving : MonoBehaviour {
 #endif
     }
 
-    //setting 'Player's' movement borders according to Viewport size and defined offset
+    //  setting 'Player's' movement borders according to Viewport size and defined offset
     void ResizeBorders() 
     {
         borders.minX = mainCamera.ViewportToWorldPoint(Vector2.zero).x + borders.minXOffset;

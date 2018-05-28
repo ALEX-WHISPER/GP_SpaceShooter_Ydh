@@ -23,6 +23,18 @@ public class BossHealth : MonoBehaviour {
         m_InitBarScale = m_HealthBar.localScale;
     }
 
+    private void Update() {
+        if (m_CurHealth <= 0) {
+            return;
+        }
+
+        if (Input.GetKey(KeyCode.LeftControl)) {
+            if (Input.GetKeyDown(KeyCode.K)) {
+                Die();
+            }
+        }
+    }
+
     public void TakeDamage(int damageAmount) {
         if (m_BossBehaviour != null && m_BossBehaviour.Invicible) {
             return;
@@ -39,7 +51,7 @@ public class BossHealth : MonoBehaviour {
 
     public void Die() {
         m_CurHealth = 0;
-        m_BossBehaviour.BossDefeated();
+        m_BossBehaviour.MoveBackOnDie();
     }
 
     private void UpdateHealthBar() {

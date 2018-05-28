@@ -66,6 +66,7 @@ public class AsteroidBehaviour : MonoBehaviour {
         if (playerExplosion != null) {
             Instantiate(playerExplosion, transform.position, transform.rotation);
         }
+        FindObjectOfType<PlayerHealth>().TakeDamage(1);
         DestructableHitting();
     }
 

@@ -1,9 +1,17 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class GameController : MonoBehaviour {
 
-    public GameObject m_GameOverPanel;
-    public GameObject m_GameWinPanel;
+    [System.Serializable]
+    public class SwitchPanelSetting {
+        public GameObject[] m_ActivatedPanels;
+        public GameObject[] m_DeactivatedPanels;
+    }
+
+    public SwitchPanelSetting GameOverPanelSetting;
+    public SwitchPanelSetting GameWinPanelSetting; 
+    public bool IsGameOver { get { return this.isGameOver; } }
 
     private LevelLoader m_LevelLoader;
     private bool isGameOver;
@@ -24,7 +32,6 @@ public class GameController : MonoBehaviour {
         } else {
             Destroy(gameObject);
         }
-
         m_LevelLoader = GetComponent<LevelLoader>();
     }
 
@@ -33,20 +40,30 @@ public class GameController : MonoBehaviour {
             OnGameOver();
         }
 
+        if (Input.GetKeyDown(KeyCode.Keypad1)) {
+            OnGameWin();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Keypad2)) {
+            OnLevelPassed();
+        }
+
         if (!isGameOver) {
             return;
         }
 
         if (Input.GetKeyDown(KeyCode.Space)) {
-            m_LevelLoader.LoadLevelWithUISettings(0);
+            m_LevelLoader.Reload();
         }
     }
 
     //  游戏胜利
     public void OnGameWin() {
-        if (!m_GameWinPanel.activeSelf) {
-            m_GameWinPanel.SetActive(true);
+        if (isGameOver) {
+            return;
         }
+        Debug.Log("OnGameWin Invoked");
+        PanelSwitching(GameWinPanelSetting);
 
         PlayerMoving.instance.DisableController();
         isGameOver = true;
@@ -54,9 +71,7 @@ public class GameController : MonoBehaviour {
 
     //  游戏失败
     public void OnGameOver() {
-        if (!m_GameOverPanel.activeSelf) {
-            m_GameOverPanel.SetActive(true);
-        }
+        PanelSwitching(GameOverPanelSetting);
         
         PlayerMoving.instance.DisableController();
         isGameOver = true;
@@ -64,6 +79,31 @@ public class GameController : MonoBehaviour {
 
     //  本关胜利
     public void OnLevelPassed() {
+        StartCoroutine(PassLevelEffect());
+    }
+
+    IEnumerator PassLevelEffect() {
+        PlayerMoving.instance.PlayerMoveToNextLevel();
+        yield return new WaitForSeconds(2f);
         m_LevelLoader.LoadNextLevel();
+    }
+
+    //  重新开始
+    public void OnRestart() {
+        m_LevelLoader.LoadLevelFromBeginning();
+    }
+
+    private void PanelSwitching(SwitchPanelSetting switchPanelSetting) {
+        for (int i = 0; i < switchPanelSetting.m_ActivatedPanels.Length; i++) {
+            if (switchPanelSetting.m_DeactivatedPanels[i] != null) {
+                switchPanelSetting.m_ActivatedPanels[i].SetActive(true);
+            }
+        }
+
+        for (int i = 0; i < switchPanelSetting.m_DeactivatedPanels.Length; i++) {
+            if (switchPanelSetting.m_DeactivatedPanels[i] != null) {
+                switchPanelSetting.m_DeactivatedPanels[i].SetActive(false);
+            }
+        }
     }
 }

@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class LevelLoader : MonoBehaviour {
     public GameObject loadingPanel;
-    public GameObject panelToBeDeactivated;
+    public GameObject[] panelToBeDeactivated;
     public Slider loadingBar;
     public string loadedHintText = "Hit 'SPACE' to continue...";
 
@@ -26,9 +26,9 @@ public class LevelLoader : MonoBehaviour {
     private void Update() {
         if (Input.GetKey(KeyCode.LeftShift)) {
             if (Input.GetKeyDown(KeyCode.PageDown)) {
-                LoadLevelWithUISettings(SceneManager.GetActiveScene().buildIndex + 1);
+                LoadLevel(SceneManager.GetActiveScene().buildIndex + 1);
             } else if (Input.GetKeyDown(KeyCode.PageUp)) {
-                LoadLevelWithUISettings(SceneManager.GetActiveScene().buildIndex - 1);
+                LoadLevel(SceneManager.GetActiveScene().buildIndex - 1);
             }
         }
     }
@@ -38,46 +38,34 @@ public class LevelLoader : MonoBehaviour {
         Invoke("LoadNextLevel", delay);
     }
 
-    //  load level with activate and deactivate ui elements
-    public void LoadLevelWithUISettings(int sceneIndex) {
-        if (loadingPanel != null) {
-            loadingPanel.SetActive(true);
-        }
-        if (panelToBeDeactivated != null) {
-            panelToBeDeactivated.SetActive(false);
-        }
-        
-        StartCoroutine(LoadLevelAsync(sceneIndex));
+    public void Reload() {
+        PanelSwitching();
+        StartCoroutine(LoadLevelAsync(SceneManager.GetActiveScene().buildIndex));
     }
-
-    //  load level0
+    
+    //  load the first scene in build settings
     public void LoadLevelFromBeginning() {
-        if (loadingPanel != null) {
-            loadingPanel.SetActive(true);
-        }
-        StartCoroutine(LoadLevelAsync(1));
+        PanelSwitching();
+        StartCoroutine(LoadLevelAsync(0));
     }
 
     //  load level based on para
     public void LoadLevel(int sceneIndex) {
-        if (loadingPanel != null) {
-            loadingPanel.SetActive(true);
-        }
+        PanelSwitching();
         StartCoroutine(LoadLevelAsync(sceneIndex));
     }
 
+    //  load the next level
     public void LoadNextLevel() {
-        if (loadingPanel != null) {
-            loadingPanel.SetActive(true);
-        }
-
+        PanelSwitching();
         StartCoroutine(LoadLevelAsync(SceneManager.GetActiveScene().buildIndex + 1));
     }
 
     IEnumerator LoadLevelAsync(int sceneIndex) {
-        if (sceneIndex >= SceneManager.sceneCountInBuildSettings - 1 || sceneIndex < 0) {
+        if (sceneIndex > SceneManager.sceneCountInBuildSettings - 1 || sceneIndex < 0) {
             sceneIndex = 0;
         }
+        Debug.Log("LoadScene: " + sceneIndex);
 
         yield return new WaitForSeconds(0.2f);
 
@@ -129,5 +117,15 @@ public class LevelLoader : MonoBehaviour {
         operation.allowSceneActivation = true;
 
         #endregion
+    }
+
+    private void PanelSwitching() {
+        if (loadingPanel != null) {
+            loadingPanel.SetActive(true);
+        }
+
+        for (int i = 0; i < panelToBeDeactivated.Length; i++) {
+            panelToBeDeactivated[i].SetActive(false);
+        }
     }
 }

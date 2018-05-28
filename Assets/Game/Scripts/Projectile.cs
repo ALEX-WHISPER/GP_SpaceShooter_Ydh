@@ -27,7 +27,9 @@ public class Projectile : MonoBehaviour {
             //  击中玩家
             if (collision.tag == "Player") {
                 //  玩家受到伤害
-                Player.instance.GetDamage(damage);
+                if (collision.GetComponent<PlayerHealth>() != null) {
+                    collision.GetComponent<PlayerHealth>().TakeDamage(damage);
+                }
 
                 //  子弹自毁
                 if (destroyedByCollision)
@@ -58,7 +60,6 @@ public class Projectile : MonoBehaviour {
                 if (collision.GetComponent<BossHealth>() != null) {
                     collision.GetComponent<BossHealth>().TakeDamage(damage);
                     PoolManager.GetInstance.ReuseObject(m_HitBossEffect, transform.position, Quaternion.identity);
-                    Debug.Log("reuse HitBossEffect");
                     Destruction();
                 }
             }

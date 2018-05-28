@@ -2,13 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[System.Serializable]
-public class ShootingSkills {
-    public Skill_PowerUp m_PowerUp;
-    public Skill_RateUp m_RateUp;
-    public Skill_UltiDiamond m_UltiDiamond;
-}
-
 //guns objects in 'Player's' hierarchy
 [System.Serializable]
 public class Guns
@@ -18,36 +11,45 @@ public class Guns
 }
 
 public class PlayerShooting : MonoBehaviour {
-
-    public ShootingSkills m_ShootingSkills;
-
+    
     [Tooltip("shooting frequency. the higher the more frequent")]
-    public float fireRate;
+    public float fireRate;  //  发射频率
 
     [Tooltip("projectile prefab")]
-    public GameObject projectileObject;
+    public GameObject projectileObject; //  子弹
 
     //time for a new shot
-    [HideInInspector] public float nextFire;
+    [HideInInspector] public float nextFire;    //  下一次发射的时间点
 
 
     [Tooltip("current weapon power")]
-    [Range(1, 4)]       //change it if you wish
-    public int weaponPower = 1;
+    [Range(1, 4)]       //  控制该值的范围在1-4之间
+    public int weaponPower = 1; //  当前发射数量火力值
     [Range(1, 4)]
-    public int fireRatePower = 1;
+    public int fireRatePower = 1;   //  当前发射频率火力值
 
-    public Guns guns;
+    public Guns guns;   //  所有发射口物体
     bool shootingIsActive = true; 
-    [HideInInspector] public int maxweaponPower = 4; 
+    [HideInInspector] public int maxweaponPower = 4;
     public static PlayerShooting instance;
 
     private GameObject m_UltiDiamondInstance;
+    private PlayerSkills playerSkillControl;
+
+    public void EnableShooting() {
+        shootingIsActive = true;
+    }
+
+    public void DisableShooting() {
+        shootingIsActive = false;
+    }
 
     private void Awake()
     {
         if (instance == null)
             instance = this;
+
+        playerSkillControl = GetComponent<PlayerSkills>();
     }
     private void Start()
     {
@@ -58,15 +60,25 @@ public class PlayerShooting : MonoBehaviour {
     }
 
     private void OnEnable() {
-        if (m_ShootingSkills.m_PowerUp) m_ShootingSkills.m_PowerUp.FireSkill_PowerUp += UpdatePowerLevel;
-        if (m_ShootingSkills.m_UltiDiamond) m_ShootingSkills.m_UltiDiamond.FireSkill_UltiDiamond += FireUlti_Diamond;
-        if (m_ShootingSkills.m_RateUp) m_ShootingSkills.m_RateUp.FireSkill_RateUp += UpdateFireRateLevel;
+        if (playerSkillControl.rateUp.isSupported)
+            playerSkillControl.rateUp.btn.GetComponent<Skill_RateUp>().FireSkill_RateUp += UpdateFireRateLevel;
+
+        if (playerSkillControl.powerUp.isSupported)
+            playerSkillControl.powerUp.btn.GetComponent<Skill_PowerUp>().FireSkill_PowerUp += UpdatePowerLevel;
+
+        if (playerSkillControl.diamond.isSupported)
+            playerSkillControl.diamond.btn.GetComponent<Skill_UltiDiamond>().FireSkill_UltiDiamond += FireUlti_Diamond;
     }
 
     private void OnDisable() {
-        if (m_ShootingSkills.m_PowerUp) m_ShootingSkills.m_PowerUp.FireSkill_PowerUp -= UpdatePowerLevel;
-        if (m_ShootingSkills.m_UltiDiamond) m_ShootingSkills.m_UltiDiamond.FireSkill_UltiDiamond -= FireUlti_Diamond;
-        if (m_ShootingSkills.m_RateUp) m_ShootingSkills.m_RateUp.FireSkill_RateUp -= UpdateFireRateLevel;
+        if (playerSkillControl.rateUp.isSupported && playerSkillControl.rateUp.btn != null)
+            playerSkillControl.rateUp.btn.GetComponent<Skill_RateUp>().FireSkill_RateUp -= UpdateFireRateLevel;
+
+        if (playerSkillControl.powerUp.isSupported && playerSkillControl.powerUp.btn != null)
+            playerSkillControl.powerUp.btn.GetComponent<Skill_PowerUp>().FireSkill_PowerUp -= UpdatePowerLevel;
+
+        if (playerSkillControl.diamond.isSupported && playerSkillControl.diamond.btn != null)
+            playerSkillControl.diamond.btn.GetComponent<Skill_UltiDiamond>().FireSkill_UltiDiamond -= FireUlti_Diamond;
     }
 
     private void Update()
@@ -81,6 +93,7 @@ public class PlayerShooting : MonoBehaviour {
         }
     }
 
+    //  提高发射频率
     private void FireRatePowerUp() {
         switch(fireRatePower) {
             case 1:
@@ -94,23 +107,27 @@ public class PlayerShooting : MonoBehaviour {
                 break;
         }
     }
-    
-    //method for a shot
+
+    #region Normal Shooting
+    //  method for a shot
     void MakeAShot() 
     {
         switch (weaponPower) // according to weapon power 'pooling' the defined anount of projectiles, on the defined position, in the defined rotation
         {
             case 1:
+                //  中间发射口
                 CreateLazerShot(projectileObject, guns.centralGun.transform.position, Vector3.zero);
                 guns.centralGunVFX.Play();
                 break;
             case 2:
+                //  左、右发射口
                 CreateLazerShot(projectileObject, guns.rightGun.transform.position, Vector3.zero);
                 guns.leftGunVFX.Play();
                 CreateLazerShot(projectileObject, guns.leftGun.transform.position, Vector3.zero);
                 guns.rightGunVFX.Play();
                 break;
             case 3:
+                //  左、右、中发射口
                 CreateLazerShot(projectileObject, guns.centralGun.transform.position, Vector3.zero);
                 CreateLazerShot(projectileObject, guns.rightGun.transform.position, new Vector3(0, 0, -5));
                 guns.leftGunVFX.Play();
@@ -118,6 +135,7 @@ public class PlayerShooting : MonoBehaviour {
                 guns.rightGunVFX.Play();
                 break;
             case 4:
+                //  左右*2 + 中间，左右各新增的发射口其实位置相同，但旋转量较原发射口发生一定偏移，作为新增发射口的模拟
                 CreateLazerShot(projectileObject, guns.centralGun.transform.position, Vector3.zero);
                 CreateLazerShot(projectileObject, guns.rightGun.transform.position, new Vector3(0, 0, -5));
                 guns.leftGunVFX.Play();
@@ -131,9 +149,10 @@ public class PlayerShooting : MonoBehaviour {
 
     void CreateLazerShot(GameObject lazer, Vector3 pos, Vector3 rot) //translating 'pooled' lazer shot to the defined position in the defined rotation
     {
-        PoolManager.GetInstance.ReuseObject(lazer, pos, Quaternion.Euler(rot));
+        PoolManager.GetInstance.ReuseObject(lazer, pos, Quaternion.Euler(rot)); //  reuse object from PlayerProjectile object pool
         //Instantiate(lazer, pos, Quaternion.Euler(rot));
     }
+    #endregion
 
     #region Skill Handler
     private void UpdateFireRateLevel(int levelValue) {
@@ -149,7 +168,12 @@ public class PlayerShooting : MonoBehaviour {
         StartCoroutine(CreateUltiDiamond(ultiInfo));
     }
 
+    //  释放大招
     IEnumerator CreateUltiDiamond(UltiDiamondInfo ultiInfo) {
+        if (!shootingIsActive) {
+            yield break;
+        }
+
         if (m_UltiDiamondInstance && !m_UltiDiamondInstance.activeSelf) {
             m_UltiDiamondInstance.SetActive(true);
         } else {
