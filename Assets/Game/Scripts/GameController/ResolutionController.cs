@@ -6,6 +6,7 @@ public class ResolutionController : MonoBehaviour {
 
     private static ResolutionController _instance;
 
+    #if UNITY_STANDALONE_WIN
     private void Awake() {
         if (_instance == null) {
             _instance = this;
@@ -18,4 +19,5 @@ public class ResolutionController : MonoBehaviour {
     private void Start() {
         Screen.SetResolution(screenWidth, screenHeight, false);
     }
+    #endif
 }
