@@ -51,10 +51,17 @@ public class GameController : MonoBehaviour {
         if (!isGameOver) {
             return;
         }
-
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN
         if (Input.GetKeyDown(KeyCode.Space)) {
             m_LevelLoader.Reload();
         }
+#endif
+
+#if UNITY_ANDROID
+        if (Input.GetTouch(0).phase == TouchPhase.Began) {
+            m_LevelLoader.Reload();
+        }
+#endif
     }
 
     //  游戏胜利

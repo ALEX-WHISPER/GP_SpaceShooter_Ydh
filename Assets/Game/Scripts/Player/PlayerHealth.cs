@@ -63,6 +63,10 @@ public class PlayerHealth : MonoBehaviour {
         private set;
     }
 
+    public void EnableInvincibilityByCheating() {
+        m_Invincible = true;
+    }
+
     public void EnableInvincibility() {
         m_Invincible = true;
         m_Animator.SetBool(m_HashDamaged, true);
