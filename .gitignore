@@ -32,7 +32,7 @@ ExportedObj/
 sysinfo.txt
 
 # Builds
-//*.apk
+*.apk
 *.unitypackage
 
 # Unity3D Generated File on Xcode
