@@ -44,6 +44,7 @@ public class PlayerSkills : MonoBehaviour {
         if (Input.GetKeyDown(diamond.key)) FireSkill_Ulti_Diamond();
         if (Input.GetKeyDown(medic.key)) FireSkill_Ulti_Medic();
 
+		//	激活所有技能
         if (Input.GetKey(KeyCode.LeftShift)) {
             if (Input.GetKey(KeyCode.KeypadEnter)) {
                 if (rateUp.isSupported) rateUp.btn.GetComponent<Skill_RateUp>().EnableSkill(SkillType.RATE_UP);

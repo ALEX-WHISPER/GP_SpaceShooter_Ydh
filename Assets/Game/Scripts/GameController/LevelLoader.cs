@@ -102,15 +102,20 @@ public class LevelLoader : MonoBehaviour {
             while (displayProgress < destProgress) {
                 //  对于当前进度数值，每一帧在实际的基础上+1
                 loadingBar.transform.Find("LoadingProgText").GetComponent<Text>().text = ++displayProgress + "%";
-                loadingBar.value = displayProgress / 100f;  //  设置进度条数值
-                yield return new WaitForEndOfFrame();
+
+				//	順序進度條(需要倒序時前面加上 '1 -', eg. 'loadingBar.value = 1 - displayProgress / 100f')
+				loadingBar.value = displayProgress / 100f;
+                
+				yield return new WaitForEndOfFrame();
             }
         }
 
         destProgress = 100f;
         while (displayProgress < destProgress) {
             loadingBar.transform.Find("LoadingProgText").GetComponent<Text>().text = ++displayProgress + "%";
-            loadingBar.value = displayProgress / 100f;
+
+			//	順序進度條(需要倒序時前面加上 '1 -', eg. 'loadingBar.value = 1 - displayProgress / 100f')
+			loadingBar.value = displayProgress / 100f;
 
             yield return new WaitForEndOfFrame();
         }
